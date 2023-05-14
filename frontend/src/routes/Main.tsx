@@ -1,16 +1,27 @@
+import { useEffect } from "react";
 import {
   useAccount,
   useConnect,
+  useContractRead,
   useContractWrite,
   useDisconnect,
   usePrepareContractWrite,
 } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import { Contract } from "ethers";
 
 import reactLogo from "@/assets/react.svg";
+import contract, { mintTokenAddress } from "@/lib/contracts";
+import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
+import getProvider from "@/lib/web3/getProvider";
 import viteLogo from "/vite.svg";
 
-import contract, { mintTokenAddress } from "@/lib/contracts";
+import Flex from "@/components/Flex";
+
+const mintTokenContract = {
+  address: mintTokenAddress,
+  abi: contract.mintTokenAbi,
+};
 
 function Main() {
   const { address, isConnected } = useAccount();
@@ -18,16 +29,73 @@ function Main() {
   const { connect } = useConnect({
     connector: new MetaMaskConnector(),
   });
-  const { config } = usePrepareContractWrite({
+
+  const { config: mintTokenConfig } = usePrepareContractWrite({
     address: mintTokenAddress,
     abi: contract.mintTokenAbi,
     functionName: "mintTestToken",
   });
-  const { isLoading, write, isSuccess, data } = useContractWrite(config);
+
+  const { isLoading, write, isSuccess, data } = useContractWrite({
+    ...mintTokenConfig,
+  });
+
+  const { data: balance, isLoading: isBalanceLoading } = useContractRead({
+    ...mintTokenContract,
+    functionName: "balanceOf",
+    args: [address],
+    watch: true,
+    enabled: isConnected && isSuccess,
+    select: (data) => {
+      let transformedData = data;
+
+      if (typeof transformedData === "bigint") {
+        transformedData = convertBigIntToNumber(transformedData);
+      }
+
+      return transformedData as number;
+    },
+    onSuccess: async (data) => {
+      try {
+        const provider = getProvider();
+
+        if (!provider) return null;
+
+        const signer = await provider.getSigner();
+        const contract = new Contract(
+          mintTokenContract.address,
+          mintTokenContract.abi,
+          signer
+        );
+
+        const tokenId = convertBigIntToNumber(
+          await contract.tokenOfOwnerByIndex(address, data - 1)
+        );
+
+        const tokenType = convertBigIntToNumber(
+          await contract.tokenTypes(tokenId)
+        );
+
+        console.log("tokenType:", tokenType, tokenId);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  });
 
   const handleMintToken = async () => {
-    write?.();
+    try {
+      write?.();
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    if (!isBalanceLoading && balance) {
+      console.log(balance);
+    }
+  }, [isBalanceLoading, balance]);
 
   return (
     <>
@@ -43,11 +111,19 @@ function Main() {
       {!isConnected && <button onClick={() => connect()}>Connect</button>}
       {isConnected && (
         <div>
-          <p>{address}</p>
-          <button onClick={handleMintToken} disabled={!write || isLoading}>
-            Mint Token
-          </button>
-          <button onClick={() => disconnect()}>Disconnect</button>
+          <p>Address: {address}</p>
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+            gap="8px"
+          >
+            <button onClick={handleMintToken} disabled={!write || isLoading}>
+              Mint Token
+            </button>
+            <button onClick={() => disconnect()}>Disconnect</button>
+          </Flex>
+
           {isSuccess && <p>{JSON.stringify(data)}</p>}
         </div>
       )}
