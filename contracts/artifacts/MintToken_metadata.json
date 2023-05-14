@@ -607,11 +607,11 @@
 			]
 		},
 		"MintToken.sol": {
-			"keccak256": "0x725091fac3c88a603a17344ff9f2d4e98a24e55a00d0d9c6c129891629da9ec7",
+			"keccak256": "0xa789d5bc1e6d5edd783b1447e66fb9dd60795930e44935b93ce37c6ed6467bd8",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://c3682b8a23bef6fa12de8778f7cb5e9cb7b168a6f824342e293cf91576b78543",
-				"dweb:/ipfs/QmcxshTcbDLjUq7aWBZSysdr1b9X48nxWN5u1LqMGMD49d"
+				"bzz-raw://f97d2228b171ea0ceeb910f85d312d4a0cecd8700b09dac6aec6ad2deada0377",
+				"dweb:/ipfs/QmUnfFFPC5vbq9Tc8VKEfWw1om4mwqesvvLCL3u26aLL4T"
 			]
 		}
 	},
