@@ -8,7 +8,7 @@ type Props = {
 
 const NFTCard = ({ type, imageSize = "100px" }: Props) => {
   return (
-    <Flex flexDirection="column">
+    <Flex flexDirection="column" width="100%">
       <figure className="nft-image-wrapper">
         <img
           src={`images/${type}.png`}
