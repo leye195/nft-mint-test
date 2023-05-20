@@ -7,6 +7,16 @@ export const mintTokenAddress: Address =
 export const saleTokenAddress: Address =
   "0x004E347Cb52314937d99dAdE20557Cc7297F4437";
 
+export const mintTokenContract = {
+  address: mintTokenAddress,
+  abi: mintTokenAbi,
+};
+
+export const saleTokenContract = {
+  address: saleTokenAddress,
+  abi: saleTokenAbi,
+};
+
 export default {
   mintTokenAbi,
   saleTokenAbi,
