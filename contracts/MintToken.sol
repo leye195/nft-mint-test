@@ -12,6 +12,7 @@ contract MintToken is ERC721Enumerable {
     function mintTestToken() public {
         uint256 tokenId = totalSupply() + 1; // mint id
 
+        require(tokenId < 100,"Mint is not allowed");
         // random 값 추출
         uint256 tokenType = uint256(keccak256(abi.encodePacked(block.timestamp,msg.sender,tokenId))) % 5 + 1;
 
