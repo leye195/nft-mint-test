@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useAccount,
   useConnect,
   useContractRead,
   useContractWrite,
-  useDisconnect,
   usePrepareContractWrite,
 } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { Contract } from "ethers";
 
-import contract, { mintTokenAddress } from "@/lib/contracts";
+import contract, { mintTokenAddress, mintTokenContract } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
 import getProvider from "@/lib/web3/getProvider";
 import type { Minted } from "@/types/nft";
 
 import Flex from "@/components/Flex";
 import NFTCard from "@/components/NFTCard";
-
-const mintTokenContract = {
-  address: mintTokenAddress,
-  abi: contract.mintTokenAbi,
-};
 
 function Main() {
   const [mintedToken, setMintedToken] = useState<Minted | null>(null);
@@ -41,7 +35,7 @@ function Main() {
     ...mintTokenConfig,
   });
 
-  const { data: balance, isLoading: isBalanceLoading } = useContractRead({
+  useContractRead({
     ...mintTokenContract,
     functionName: "balanceOf",
     args: [address],
@@ -95,12 +89,6 @@ function Main() {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    if (!isBalanceLoading && balance) {
-      console.log(balance);
-    }
-  }, [isBalanceLoading, balance]);
 
   return (
     <Flex
