@@ -3,9 +3,9 @@ import mintTokenAbi from "./mintToken";
 import saleTokenAbi from "./saleToken";
 
 export const mintTokenAddress: Address =
-  "0xDDBb3C201FFb00e33AAA46DC310b38A32bc451e8";
+  "0xCc7A340FCa3CC4623B7079fA2d1F6365a36F9ff3";
 export const saleTokenAddress: Address =
-  "0x004E347Cb52314937d99dAdE20557Cc7297F4437";
+  "0x65b20D4618153a09a0142188426e0d680e6D4e1E";
 
 export const mintTokenContract = {
   address: mintTokenAddress,
