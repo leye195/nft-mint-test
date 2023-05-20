@@ -1,14 +1,29 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import AppProvider from "@/components/AppProvider";
 import Main from "@/routes/Main";
+import MyToken from "@/routes/MyToken";
+
+import AppProvider from "@/components/AppProvider";
+import Layout from "@/components/Layout";
 
 import "./App.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Main />,
+    element: (
+      <Layout>
+        <Main />
+      </Layout>
+    ),
+  },
+  {
+    path: "/my-token",
+    element: (
+      <Layout>
+        <MyToken />
+      </Layout>
+    ),
   },
 ]);
 
