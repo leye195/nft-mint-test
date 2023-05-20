@@ -45,6 +45,13 @@
   transition: all 0.2s ease-in-out;
 }
 
+.nft-sale .price {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background-color: #444343;
+  font-weight: 500;
+}
+
 .nft-wrapper:hover .nft-sale {
   opacity: 1;
   background-color: rgba(0, 0, 0, 0.4);

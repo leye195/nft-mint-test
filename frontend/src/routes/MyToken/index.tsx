@@ -89,7 +89,7 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
               justifyContent="center"
               gap={4}
             >
-              <p>{price} Matic</p>
+              <p className="price">{price} Matic</p>
               <button onClick={handleCancel(tokenId)} disabled={isCanceling}>
                 Cancel
               </button>
