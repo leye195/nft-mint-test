@@ -1,4 +1,5 @@
 .nft-image-wrapper {
+  display: flex;
   margin: 0;
   width: inherit;
   background-color: white;
