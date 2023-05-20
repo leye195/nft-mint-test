@@ -7,6 +7,7 @@ type Props = ComponentProps<"div"> & {
   flexDirection?: CSSProperties["flexDirection"];
   gap?: CSSProperties["gap"];
   width?: CSSProperties["width"];
+  height?: CSSProperties["height"];
   padding?: CSSProperties["padding"];
 };
 
@@ -17,6 +18,7 @@ const Flex = ({
   justifyContent = "flex-start",
   flexDirection = "row",
   width = "auto",
+  height = "auto",
   padding = "0",
   gap = 0,
 }: Props) => {
@@ -29,6 +31,7 @@ const Flex = ({
         flexDirection,
         gap,
         width,
+        height,
         padding,
       }}
     >
