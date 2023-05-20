@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useAccount,
   useConnect,
@@ -10,13 +10,13 @@ import {
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { Contract } from "ethers";
 
-import reactLogo from "@/assets/react.svg";
 import contract, { mintTokenAddress } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
 import getProvider from "@/lib/web3/getProvider";
-import viteLogo from "/vite.svg";
+import type { Minted } from "@/types/nft";
 
 import Flex from "@/components/Flex";
+import NFTCard from "@/components/NFTCard";
 
 const mintTokenContract = {
   address: mintTokenAddress,
@@ -24,8 +24,9 @@ const mintTokenContract = {
 };
 
 function Main() {
+  const [mintedToken, setMintedToken] = useState<Minted | null>(null);
+
   const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
   const { connect } = useConnect({
     connector: new MetaMaskConnector(),
   });
@@ -36,7 +37,7 @@ function Main() {
     functionName: "mintTestToken",
   });
 
-  const { isLoading, write, isSuccess, data } = useContractWrite({
+  const { isLoading, write, isSuccess } = useContractWrite({
     ...mintTokenConfig,
   });
 
@@ -77,6 +78,10 @@ function Main() {
         );
 
         console.log("tokenType:", tokenType, tokenId);
+        setMintedToken({
+          tokenId,
+          tokenType,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -98,19 +103,16 @@ function Main() {
   }, [isBalanceLoading, balance]);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <Flex
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+    >
+      <h1>Mint NFT Token</h1>
       {!isConnected && <button onClick={() => connect()}>Connect</button>}
       {isConnected && (
-        <div>
+        <Flex flexDirection="column" alignItems="center">
           <p>Address: {address}</p>
           <Flex
             alignItems="center"
@@ -121,13 +123,25 @@ function Main() {
             <button onClick={handleMintToken} disabled={!write || isLoading}>
               Mint Token
             </button>
-            <button onClick={() => disconnect()}>Disconnect</button>
           </Flex>
-
-          {isSuccess && <p>{JSON.stringify(data)}</p>}
-        </div>
+          <div
+            style={{
+              padding: "12px",
+              borderRadius: "8px",
+              marginTop: "20px",
+              fontWeight: 800,
+            }}
+          >
+            {isSuccess && mintedToken && (
+              <Flex flexDirection="column" alignItems="center">
+                <NFTCard type={mintedToken.tokenType} imageSize="200px" />
+                <p>TokenID: {mintedToken.tokenId}</p>
+              </Flex>
+            )}
+          </div>
+        </Flex>
       )}
-    </>
+    </Flex>
   );
 }
 
