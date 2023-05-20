@@ -17,6 +17,19 @@
 				"type": "constructor"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "cancelOrder",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "getOnSaleTokenArrayLength",
 				"outputs": [
@@ -236,19 +249,19 @@
 			]
 		},
 		"MintToken.sol": {
-			"keccak256": "0xa789d5bc1e6d5edd783b1447e66fb9dd60795930e44935b93ce37c6ed6467bd8",
+			"keccak256": "0xb59712e7125eebf6102b5475e132bc689ce24d1e1b0e4b618ca7e0d250d5efe4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f97d2228b171ea0ceeb910f85d312d4a0cecd8700b09dac6aec6ad2deada0377",
-				"dweb:/ipfs/QmUnfFFPC5vbq9Tc8VKEfWw1om4mwqesvvLCL3u26aLL4T"
+				"bzz-raw://944ed3ac2eee4554fc72e955bfc784a1f11f44561c33747e862b0754b889ecc6",
+				"dweb:/ipfs/QmRa75ckAP7njKgxTBeZeX4K37djyDnRGME1iaC5qY2NJR"
 			]
 		},
 		"SaleToken.sol": {
-			"keccak256": "0x39544debbbc267df8b1853baed51eb1aca13e3a9f7da39470723156f005274e5",
+			"keccak256": "0x9074f3dafd062f41d1fb4189efbc46720a1ed34c176d2a10d9597df110cb20ea",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://858ba3a4392f897a602fd96577c7a4a6a9e7da8a2b1cd79eb17954363571509e",
-				"dweb:/ipfs/QmemDorZ9mfs3AY6eMkwgf8YvW4CfiyNoF6WX7Kcx5YtpZ"
+				"bzz-raw://0aaa02a8653d59a558de2b9cf94167cde48917528c94c1a01c383410da13c967",
+				"dweb:/ipfs/QmdJGMc8k7KJjb9Mqr6UfHo4WW4AzEGFvHpULULwfrRUMm"
 			]
 		}
 	},

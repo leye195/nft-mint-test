@@ -69,4 +69,23 @@ contract SaleToken {
   function getOnSaleTokenArrayLength() view public returns (uint256) {
     return onSaleTokenArray.length;
   }
+
+  function cancelOrder(uint256 _tokenId) public {
+    address tokenOwner = mintTokenAddress.ownerOf(_tokenId);
+
+    // token owner 체크
+    require(tokenOwner == msg.sender, "caller is not token owner.");
+        
+    // 판매 등록 상태 체크
+    require(tokenPrices[_tokenId] > 0, "This order is already on canceled.");
+
+    tokenPrices[_tokenId] = 0;
+
+    for(uint256 i=0;i<onSaleTokenArray.length;i++) {
+      if(tokenPrices[onSaleTokenArray[i]] == 0) {
+        onSaleTokenArray[i] = onSaleTokenArray[onSaleTokenArray.length - 1];
+        onSaleTokenArray.pop();
+      }
+    }
+  }
 }
