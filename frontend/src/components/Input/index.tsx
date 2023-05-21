@@ -1,8 +1,10 @@
-import { ComponentPropsWithRef } from "react";
+import { ComponentPropsWithRef, forwardRef } from "react";
 import "./input.css";
 
-const Input = (props: ComponentPropsWithRef<"input">) => {
-  return <input {...props} />;
-};
+type Props = ComponentPropsWithRef<"input">;
+
+const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
+  return <input {...props} ref={ref} />;
+});
 
 export default Input;
