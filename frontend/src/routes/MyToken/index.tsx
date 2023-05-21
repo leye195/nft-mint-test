@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAccount, useContractRead } from "wagmi";
-import { Contract, formatEther } from "ethers";
+import { Contract, formatEther, parseEther } from "ethers";
 
 import { mintTokenContract, saleTokenContract } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
@@ -25,23 +25,21 @@ type NftProps = {
 
 const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
   const [isCanceling, setIsCanceling] = useState(false);
+  const [isSelling, setIsSelling] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { address, isConnected } = useAccount();
-  const {
-    register,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<{ sellPrice: string }>({
+  const { register, watch, setValue } = useForm<{ sellPrice: string }>({
     mode: "onChange",
   });
   const { sellPrice = "" } = watch();
 
-  const handleSale = async () => {
+  const handleSale = (tokenId: string) => async () => {
     try {
       const provider = getProvider();
 
       if (!provider || !isConnected || !address) return;
+
+      setIsSelling(true);
 
       const signer = await provider.getSigner();
       const mintContract = new Contract(
@@ -63,8 +61,20 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
       if (!isApproved) {
         await mintContract.setApprovalForAll(saleTokenContract.address, true);
       }
+
+      const tx = await saleContract.setForSaleToken(
+        tokenId,
+        parseEther(sellPrice)
+      );
+
+      if (tx.hash) {
+        setValue("sellPrice", "");
+        handleOpen(false);
+      }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsSelling(false);
     }
   };
 
@@ -89,8 +99,6 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
       await saleContract.cancelOrder(tokenId);
     } catch (err) {
       console.log(err);
-    } finally {
-      setIsCanceling(false);
     }
   };
 
@@ -100,7 +108,9 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
     }
   }, [isOpen]);
 
-  console.log(!!errors.sellPrice, errors);
+  useEffect(() => {
+    setIsCanceling(false);
+  }, [price]);
 
   return (
     <div className="nft-wrapper">
@@ -120,7 +130,7 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
               </button>
             </Flex>
           ) : (
-            <button onClick={() => handleOpen(true)}>Sale</button>
+            <button onClick={() => handleOpen(true)}>Sell</button>
           )}
         </Flex>
       </div>
@@ -160,7 +170,6 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
                 },
               })}
               placeholder="0"
-              defaultValue={sellPrice}
               inputMode="numeric"
               autoComplete="off"
               value={sellPrice}
@@ -171,10 +180,10 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
               style={{
                 flex: 1,
               }}
-              onClick={handleSale}
-              disabled={!sellPrice || +sellPrice === 0}
+              onClick={handleSale(tokenId)}
+              disabled={!sellPrice || +sellPrice === 0 || isSelling}
             >
-              Sell
+              Confirm
             </button>
             <button
               style={{
