@@ -1,0 +1,44 @@
+.modal-block {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.modal-box {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-header button {
+  padding: 0;
+  background-color: transparent;
+}
+
+.modal-header button:hover {
+  border-color: transparent;
+}
+
+.modal-header-title {
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.dimmer {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
