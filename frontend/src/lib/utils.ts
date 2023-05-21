@@ -37,3 +37,14 @@ export const convertAddress = (
   `${account.substring(0, startIndex || 10)}...${account.substring(
     endIndex || 32
   )}`;
+
+/**
+ * @description portalRoot 생성
+ * @param id root id
+ */
+export function createPortalRoot(id: string) {
+  const drawerRoot = document.createElement("div");
+  drawerRoot.setAttribute("id", id);
+
+  return drawerRoot;
+}
