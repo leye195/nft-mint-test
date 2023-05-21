@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { useAccount, useContractRead } from "wagmi";
 import { Contract, formatEther } from "ethers";
 
@@ -11,6 +12,8 @@ import type { Minted } from "@/types/nft";
 import Flex from "@/components/Flex";
 import SectionWithLabel from "@/components/SectionWithLabel";
 import NFTCard from "@/components/NFTCard";
+import Input from "@/components/Input";
+import Modal from "@/components/Modal";
 
 import "./mytoken.css";
 
@@ -22,7 +25,17 @@ type NftProps = {
 
 const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
   const [isCanceling, setIsCanceling] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { address, isConnected } = useAccount();
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<{ sellPrice: string }>({
+    mode: "onChange",
+  });
+  const { sellPrice = "" } = watch();
 
   const handleSale = async () => {
     try {
@@ -55,6 +68,10 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
     }
   };
 
+  const handleOpen = (isOpen: boolean) => {
+    setIsOpen(isOpen);
+  };
+
   const handleCancel = (tokenId: string) => async () => {
     try {
       const provider = getProvider();
@@ -77,6 +94,14 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) {
+      setValue("sellPrice", "");
+    }
+  }, [isOpen]);
+
+  console.log(!!errors.sellPrice, errors);
+
   return (
     <div className="nft-wrapper">
       <NFTCard key={tokenId} type={tokenType} imageSize="100%" />
@@ -95,10 +120,73 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
               </button>
             </Flex>
           ) : (
-            <button onClick={handleSale}>Sale</button>
+            <button onClick={() => handleOpen(true)}>Sale</button>
           )}
         </Flex>
       </div>
+      <Modal
+        isOpen={isOpen}
+        handleOpen={handleOpen}
+        headerTitle="Sale Token"
+        padding="24px 24px 32px 24px"
+        isHideClose
+      >
+        <Flex flexDirection="column" gap="18px">
+          <Flex flexDirection="column" width="100%">
+            <label
+              style={{
+                fontSize: "18px",
+              }}
+            >
+              Price
+            </label>
+            <Input
+              {...register("sellPrice", {
+                validate: (value) => +value > 0,
+                onChange: (e) => {
+                  const { value } = e.target;
+                  const replacedValue = value.replace(
+                    /[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-_=+\\|[\]{};:'",.<>/\s]/g,
+                    ""
+                  );
+                  const parsedNumber = Number(replacedValue);
+
+                  if (replacedValue && !isNaN(parsedNumber)) {
+                    setValue("sellPrice", parsedNumber.toString());
+                    return;
+                  }
+
+                  setValue("sellPrice", "");
+                },
+              })}
+              placeholder="0"
+              defaultValue={sellPrice}
+              inputMode="numeric"
+              autoComplete="off"
+              value={sellPrice}
+            />
+          </Flex>
+          <Flex gap="4px" width="100%">
+            <button
+              style={{
+                flex: 1,
+              }}
+              onClick={handleSale}
+              disabled={!sellPrice || +sellPrice === 0}
+            >
+              Sell
+            </button>
+            <button
+              style={{
+                flex: 1,
+              }}
+              onClick={() => handleOpen(false)}
+            >
+              Cancel
+            </button>
+          </Flex>
+        </Flex>
+      </Modal>
     </div>
   );
 };
