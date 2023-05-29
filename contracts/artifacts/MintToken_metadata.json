@@ -66,6 +66,25 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "from",
 						"type": "address"
 					},
@@ -145,6 +164,42 @@
 				"inputs": [
 					{
 						"internalType": "address",
+						"name": "_tokenOwner",
+						"type": "address"
+					}
+				],
+				"name": "getTokens",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "tokenId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "tokenType",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct MintToken.TokenData[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
 						"name": "owner",
 						"type": "address"
 					},
@@ -186,6 +241,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -202,6 +270,13 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -256,6 +331,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "saleToken",
+				"outputs": [
+					{
+						"internalType": "contract SaleToken",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -269,6 +357,19 @@
 					}
 				],
 				"name": "setApprovalForAll",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_saleToken",
+						"type": "address"
+					}
+				],
+				"name": "setSaleToken",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -421,6 +522,19 @@
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -452,8 +566,14 @@
 				"name()": {
 					"details": "See {IERC721Metadata-name}."
 				},
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
 				"ownerOf(uint256)": {
 					"details": "See {IERC721-ownerOf}."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
 				},
 				"safeTransferFrom(address,address,uint256)": {
 					"details": "See {IERC721-safeTransferFrom}."
@@ -484,6 +604,9 @@
 				},
 				"transferFrom(address,address,uint256)": {
 					"details": "See {IERC721-transferFrom}."
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
 				}
 			},
 			"version": 1
@@ -510,6 +633,14 @@
 		"remappings": []
 	},
 	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa94b34880e3c1b0b931662cb1c09e5dfa6662f31cba80e07c5ee71cd135c9673",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://40fb1b5102468f783961d0af743f91b9980cf66b50d1d12009f6bb1869cea4d2",
+				"dweb:/ipfs/QmYqEbJML4jB1GHbzD4cUZDtJg5wVwNm3vDJq1GbyDus8y"
+			]
+		},
 		"@openzeppelin/contracts/token/ERC721/ERC721.sol": {
 			"keccak256": "0x1e854874c68bec05be100dc0092cb5fbbc71253d370ae98ddef248bbfc3fe118",
 			"license": "MIT",
@@ -607,11 +738,19 @@
 			]
 		},
 		"MintToken.sol": {
-			"keccak256": "0xb59712e7125eebf6102b5475e132bc689ce24d1e1b0e4b618ca7e0d250d5efe4",
+			"keccak256": "0x4d805561c2c1cbf217118812d13987c7b47ebbe3624dd71c41d8640fd86a94d4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://944ed3ac2eee4554fc72e955bfc784a1f11f44561c33747e862b0754b889ecc6",
-				"dweb:/ipfs/QmRa75ckAP7njKgxTBeZeX4K37djyDnRGME1iaC5qY2NJR"
+				"bzz-raw://f6ca6c6b67f1e6cd06cafd26d438195d588dc298750ec9edbf97f912afbeb975",
+				"dweb:/ipfs/QmYLPXzm9u7p4mMFEWxFpdjEJ4qxwpn4y7UTgzcBsDQGrx"
+			]
+		},
+		"SaleToken.sol": {
+			"keccak256": "0xc0f9e2757c6328311634b08b2e7d98c47da730158f9e8b74e5b5f1d386456a68",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://dcc0c51b6820ba995d72a16b66e7f18a5811fac316ca6078fed71ccdce0476b0",
+				"dweb:/ipfs/QmXi2dhUGnAASXjRRwvkgSbWhaAxhMNhMyRqmqcjzyYQRF"
 			]
 		}
 	},

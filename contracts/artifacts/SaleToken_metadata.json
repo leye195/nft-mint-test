@@ -43,6 +43,25 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "getTokenPrice",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "mintTokenAddress",
 				"outputs": [
@@ -152,6 +171,14 @@
 		"remappings": []
 	},
 	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa94b34880e3c1b0b931662cb1c09e5dfa6662f31cba80e07c5ee71cd135c9673",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://40fb1b5102468f783961d0af743f91b9980cf66b50d1d12009f6bb1869cea4d2",
+				"dweb:/ipfs/QmYqEbJML4jB1GHbzD4cUZDtJg5wVwNm3vDJq1GbyDus8y"
+			]
+		},
 		"@openzeppelin/contracts/token/ERC721/ERC721.sol": {
 			"keccak256": "0x1e854874c68bec05be100dc0092cb5fbbc71253d370ae98ddef248bbfc3fe118",
 			"license": "MIT",
@@ -249,19 +276,19 @@
 			]
 		},
 		"MintToken.sol": {
-			"keccak256": "0xb59712e7125eebf6102b5475e132bc689ce24d1e1b0e4b618ca7e0d250d5efe4",
+			"keccak256": "0x4d805561c2c1cbf217118812d13987c7b47ebbe3624dd71c41d8640fd86a94d4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://944ed3ac2eee4554fc72e955bfc784a1f11f44561c33747e862b0754b889ecc6",
-				"dweb:/ipfs/QmRa75ckAP7njKgxTBeZeX4K37djyDnRGME1iaC5qY2NJR"
+				"bzz-raw://f6ca6c6b67f1e6cd06cafd26d438195d588dc298750ec9edbf97f912afbeb975",
+				"dweb:/ipfs/QmYLPXzm9u7p4mMFEWxFpdjEJ4qxwpn4y7UTgzcBsDQGrx"
 			]
 		},
 		"SaleToken.sol": {
-			"keccak256": "0x9074f3dafd062f41d1fb4189efbc46720a1ed34c176d2a10d9597df110cb20ea",
+			"keccak256": "0xc0f9e2757c6328311634b08b2e7d98c47da730158f9e8b74e5b5f1d386456a68",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0aaa02a8653d59a558de2b9cf94167cde48917528c94c1a01c383410da13c967",
-				"dweb:/ipfs/QmdJGMc8k7KJjb9Mqr6UfHo4WW4AzEGFvHpULULwfrRUMm"
+				"bzz-raw://dcc0c51b6820ba995d72a16b66e7f18a5811fac316ca6078fed71ccdce0476b0",
+				"dweb:/ipfs/QmXi2dhUGnAASXjRRwvkgSbWhaAxhMNhMyRqmqcjzyYQRF"
 			]
 		}
 	},

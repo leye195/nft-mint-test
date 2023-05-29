@@ -33,6 +33,23 @@ contract MintToken is ERC721Enumerable, Ownable {
     }
 
 
+    function getTokens(address _tokenOwner) view public returns(TokenData[] memory) {
+        uint256 balanceLength =  balanceOf(_tokenOwner);
+
+        require(balanceLength == 0, "Owner did not have token.");
+
+        TokenData[] memory tokenData = new TokenData[](balanceLength);
+
+        for(uint256 i=0;i<balanceLength;i++) {
+            uint256 tokenId = tokenOfOwnerByIndex(_tokenOwner,i);
+            uint256 tokenType = tokenTypes[tokenId];
+            uint256 price = saleToken.getTokenPrice(tokenId);
+
+            tokenData[i] = TokenData(tokenId,tokenType,price);
+        }
+
+        return tokenData;
+    }
 
     function setSaleToken(address _saleToken) public onlyOwner {
         saleToken = SaleToken(_saleToken);
