@@ -21,8 +21,20 @@ function Main() {
   const [mintedToken, setMintedToken] = useState<Minted | null>(null);
 
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect({
+  const {
+    connect,
+    pendingConnector,
+    isLoading: isConnecting,
+  } = useConnect({
     connector: new MetaMaskConnector(),
+    onError: (e) => {
+      const { message } = e;
+
+      if (message === "Connector not found") {
+        pendingConnector?.disconnect();
+        window.open("https://metamask.io/download.html");
+      }
+    },
   });
 
   const { config: mintTokenConfig } = usePrepareContractWrite({
@@ -98,7 +110,14 @@ function Main() {
       width="100%"
     >
       <h1>Mint NFT Token</h1>
-      {!isConnected && <button onClick={() => connect()}>Connect</button>}
+      {!isConnected && (
+        <button
+          onClick={() => connect()}
+          disabled={!!pendingConnector?.id && isConnecting}
+        >
+          Connect Metamask
+        </button>
+      )}
       {isConnected && (
         <Flex flexDirection="column" alignItems="center">
           <p>Address: {address}</p>
