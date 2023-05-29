@@ -20,7 +20,7 @@ yarn dev
 
 ### How to test on local?
 
-**1. Remix(https://remix.ethereum.org/)**
+**1. Remix(https://remix.ethereum.org/)** (option1)
 
 ```
 # install @remix-project/remixd
@@ -35,7 +35,7 @@ Click Access File System and Connect
 
 https://github.com/leye195/nft-mint-test/assets/30601503/be05ed40-665d-47ca-aa5b-5601e1af2bc6
 
-**2. Truffle**
+**2. Truffle** (option2)
 
 - install ganache-cli
 
