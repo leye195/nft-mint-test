@@ -99,6 +99,7 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
       await saleContract.cancelOrder(tokenId);
     } catch (err) {
       console.log(err);
+      setIsCanceling(false);
     }
   };
 
@@ -130,7 +131,9 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
               </button>
             </Flex>
           ) : (
-            <button onClick={() => handleOpen(true)}>Sell</button>
+            <button onClick={() => handleOpen(true)} disabled={isSelling}>
+              Sell
+            </button>
           )}
         </Flex>
       </div>
@@ -225,7 +228,7 @@ function MyToken() {
       try {
         const provider = getProvider();
 
-        if (!provider) return null;
+        if (!provider || data === 0) return;
 
         const signer = await provider.getSigner();
         const mintContract = new Contract(
@@ -233,33 +236,21 @@ function MyToken() {
           mintTokenContract.abi,
           signer
         );
-        const saleContract = new Contract(
-          saleTokenContract.address,
-          saleTokenContract.abi,
-          signer
-        );
 
-        const tokenList = [];
+        const tokens = await mintContract.getTokens(address);
 
-        for (let i = 0; i < data; i++) {
-          const tokenId = convertBigIntToNumber(
-            await mintContract.tokenOfOwnerByIndex(address, i)
-          );
-          const tokenType = convertBigIntToNumber(
-            await mintContract.tokenTypes(tokenId)
-          );
+        const tokenList = tokens.map((token: Minted) => {
+          const tokenId = convertBigIntToNumber(token.tokenId);
+          const tokenType = convertBigIntToNumber(token.tokenType);
           const price = parseFloat(
-            formatEther(
-              convertBigIntToNumber(await saleContract.tokenPrices(tokenId))
-            )
+            formatEther(convertBigIntToNumber(token.price ?? 0))
           );
-
-          tokenList.push({
+          return {
             tokenId,
             tokenType,
             price,
-          });
-        }
+          };
+        });
 
         setTokenList(tokenList);
       } catch (error) {
