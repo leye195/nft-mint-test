@@ -88,4 +88,8 @@ contract SaleToken {
       }
     }
   }
+
+  function getTokenPrice(uint256 _tokenId) public view returns (uint256) {
+    return tokenPrices[_tokenId];
+  }
 }
