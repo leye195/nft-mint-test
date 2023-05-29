@@ -36,7 +36,7 @@ contract MintToken is ERC721Enumerable, Ownable {
     function getTokens(address _tokenOwner) view public returns(TokenData[] memory) {
         uint256 balanceLength =  balanceOf(_tokenOwner);
 
-        require(balanceLength == 0, "Owner did not have token.");
+        require(balanceLength > 0, "Owner did not have token.");
 
         TokenData[] memory tokenData = new TokenData[](balanceLength);
 
