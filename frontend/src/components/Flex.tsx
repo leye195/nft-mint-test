@@ -13,6 +13,7 @@ type Props = ComponentProps<"div"> & {
 
 const Flex = ({
   children,
+  className = "",
   display = "flex",
   alignItems = "flex-start",
   justifyContent = "flex-start",
@@ -24,6 +25,7 @@ const Flex = ({
 }: Props) => {
   return (
     <div
+      className={className}
       style={{
         display,
         alignItems,

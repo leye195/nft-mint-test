@@ -1,10 +1,10 @@
 import { useAccount, useDisconnect } from "wagmi";
-import Flex from "../Flex";
 import { Link } from "react-router-dom";
+
+import Flex from "@/components/Flex";
 
 const Header = () => {
   const { isConnected } = useAccount();
-
   const { disconnect } = useDisconnect();
 
   return (
@@ -27,22 +27,35 @@ const Header = () => {
             NFT Mint
           </span>
         </Link>
-        {isConnected && (
-          <Flex gap="12px" alignItems="center">
-            <Link to="/my-token">
-              <span
-                style={{
-                  color: "white",
-                  fontWeight: 800,
-                  fontSize: 20,
-                }}
-              >
-                My Token
-              </span>
-            </Link>
-            <button onClick={() => disconnect()}>Disconnect</button>
-          </Flex>
-        )}
+        <Flex gap="12px" alignItems="center">
+          <Link to="/sale">
+            <span
+              style={{
+                color: "white",
+                fontWeight: 800,
+                fontSize: 20,
+              }}
+            >
+              on Sale
+            </span>
+          </Link>
+          {isConnected && (
+            <>
+              <Link to="/my-token">
+                <span
+                  style={{
+                    color: "white",
+                    fontWeight: 800,
+                    fontSize: 20,
+                  }}
+                >
+                  My Token
+                </span>
+              </Link>
+              <button onClick={() => disconnect()}>Disconnect</button>
+            </>
+          )}
+        </Flex>
       </Flex>
     </header>
   );
