@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
-import { Contract, formatEther } from "ethers";
+import { Contract, formatEther, parseEther } from "ethers";
 
 import { mintTokenContract, saleTokenContract } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
@@ -21,7 +21,34 @@ type OnSaleNFT = {
 
 const NFTToken = ({ tokenId, tokenType, price, owner }: OnSaleNFT) => {
   const [isOwner, setIsOwner] = useState(false);
-  const { address } = useAccount();
+  const [isBuying, setIsBuying] = useState(false);
+  const { address, isConnected } = useAccount();
+
+  const handleBuy = async () => {
+    try {
+      const provider = getProvider();
+
+      if (!provider || !isConnected || isOwner || !isConnected) {
+        return;
+      }
+
+      setIsBuying(true);
+
+      const signer = await provider.getSigner();
+      const saleContract = new Contract(
+        saleTokenContract.address,
+        saleTokenContract.abi,
+        signer
+      );
+
+      await saleContract.purchaseToken(tokenId, {
+        value: parseEther(price.toString()),
+      });
+    } catch (err) {
+      console.log(err);
+      setIsBuying(false);
+    }
+  };
 
   useEffect(() => {
     setIsOwner(address === owner);
@@ -34,7 +61,12 @@ const NFTToken = ({ tokenId, tokenType, price, owner }: OnSaleNFT) => {
         <span>TokenID: {tokenId}</span>
         <Flex alignItems="center" justifyContent="space-between" width="100%">
           <b>{price} MATIC</b>
-          <button disabled={isOwner}>Buy</button>
+          <button
+            disabled={isOwner || !isConnected || isBuying || !price}
+            onClick={handleBuy}
+          >
+            Buy
+          </button>
         </Flex>
       </Flex>
     </Flex>
