@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.18;
 
-import "MintToken.sol";
+import "./MintToken.sol";
 
 contract SaleToken {
   // MintToken contract address 값 할당 변수
