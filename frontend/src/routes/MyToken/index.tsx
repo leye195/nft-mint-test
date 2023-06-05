@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAccount, useContractRead } from "wagmi";
-import { Contract, formatEther, parseEther } from "ethers";
+import { formatEther, parseEther } from "ethers";
+import { getContract } from "viem";
 
 import { mintTokenContract, saleTokenContract } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
-import getProvider from "@/lib/web3/getProvider";
+import { publicClient, walletClient } from "@/lib/web3/getProvider";
 import type { Minted } from "@/types/nft";
 
 import Flex from "@/components/Flex";
@@ -35,39 +36,39 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
 
   const handleSale = (tokenId: string) => async () => {
     try {
-      const provider = getProvider();
+      if (!address) return;
 
-      if (!provider || !isConnected || !address) return;
+      const mintContract = getContract({
+        address: mintTokenContract.address,
+        abi: mintTokenContract.abi,
+        publicClient,
+        walletClient: walletClient(address),
+      });
+      const saleContract = getContract({
+        address: saleTokenContract.address,
+        abi: saleTokenContract.abi,
+        publicClient,
+        walletClient: walletClient(address),
+      });
 
-      setIsSelling(true);
-
-      const signer = await provider.getSigner();
-      const mintContract = new Contract(
-        mintTokenContract.address,
-        mintTokenContract.abi,
-        signer
-      );
-      const saleContract = new Contract(
-        saleTokenContract.address,
-        saleTokenContract.abi,
-        signer
-      );
-
-      const isApproved = await mintContract.isApprovedForAll(
+      const isApproved = await mintContract.read.isApprovedForAll([
         address,
-        saleTokenContract.address
-      );
+        saleTokenContract.address,
+      ]);
 
       if (!isApproved) {
-        await mintContract.setApprovalForAll(saleTokenContract.address, true);
+        await mintContract.write.setApprovalForAll([
+          saleTokenContract.address,
+          true,
+        ]);
       }
 
-      const tx = await saleContract.setForSaleToken(
+      const hash = await saleContract.write.setForSaleToken([
         tokenId,
-        parseEther(sellPrice)
-      );
+        parseEther(sellPrice),
+      ]);
 
-      if (tx.hash) {
+      if (hash) {
         setValue("sellPrice", "");
         handleOpen(false);
       }
@@ -84,19 +85,24 @@ const NFTBox = ({ tokenId, tokenType, price }: NftProps) => {
 
   const handleCancel = (tokenId: string) => async () => {
     try {
-      const provider = getProvider();
+      if (!isConnected || !address) return;
 
-      if (!provider || !isConnected || !address) return;
-
+      /*
       const signer = await provider.getSigner();
       const saleContract = new Contract(
         saleTokenContract.address,
         saleTokenContract.abi,
         signer
-      );
+      );*/
+
+      const saleContract = getContract({
+        address: saleTokenContract.address,
+        abi: saleTokenContract.abi,
+        walletClient: walletClient(address),
+      });
 
       setIsCanceling(true);
-      await saleContract.cancelOrder(tokenId);
+      await saleContract.write.cancelOrder([tokenId]);
     } catch (err) {
       console.log(err);
       setIsCanceling(false);
@@ -226,19 +232,17 @@ function MyToken() {
     },
     onSuccess: async (data) => {
       try {
-        const provider = getProvider();
+        if (!address || data === 0) return;
 
-        if (!provider || data === 0) return;
+        const mintContract = getContract({
+          address: mintTokenContract.address,
+          abi: mintTokenContract.abi,
+          publicClient,
+        });
 
-        const signer = await provider.getSigner();
-        const mintContract = new Contract(
-          mintTokenContract.address,
-          mintTokenContract.abi,
-          signer
-        );
-
-        const tokens = await mintContract.getTokens(address);
-
+        const tokens = (await mintContract.read.getTokens([
+          address,
+        ])) as Minted[];
         const tokenList = tokens.map((token: Minted) => {
           const tokenId = convertBigIntToNumber(token.tokenId);
           const tokenType = convertBigIntToNumber(token.tokenType);

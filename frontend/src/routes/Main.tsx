@@ -6,12 +6,11 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
+import { getContract } from "viem";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
-import { Contract } from "ethers";
-
 import contract, { mintTokenAddress, mintTokenContract } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
-import getProvider from "@/lib/web3/getProvider";
+import { publicClient } from "@/lib/web3/getProvider";
 import type { Minted } from "@/types/nft";
 
 import Flex from "@/components/Flex";
@@ -64,26 +63,20 @@ function Main() {
     },
     onSuccess: async (data) => {
       try {
-        const provider = getProvider();
-
-        if (!provider) return null;
-
-        const signer = await provider.getSigner();
-        const contract = new Contract(
-          mintTokenContract.address,
-          mintTokenContract.abi,
-          signer
-        );
+        const contract = getContract({
+          address: mintTokenContract.address,
+          abi: mintTokenContract.abi,
+          publicClient,
+        });
 
         const tokenId = convertBigIntToNumber(
-          await contract.tokenOfOwnerByIndex(address, data - 1)
+          (await contract.read.tokenOfOwnerByIndex([address, data - 1])) as any
         );
 
         const tokenType = convertBigIntToNumber(
-          await contract.tokenTypes(tokenId)
+          (await contract.read.tokenTypes([tokenId])) as any
         );
 
-        console.log("tokenType:", tokenType, tokenId);
         setMintedToken({
           tokenId,
           tokenType,

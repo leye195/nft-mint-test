@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
-import { Contract, formatEther, parseEther } from "ethers";
+import { formatEther } from "ethers";
+import { getContract, parseEther } from "viem";
 
 import { mintTokenContract, saleTokenContract } from "@/lib/contracts";
 import convertBigIntToNumber from "@/lib/web3/bigIntToNumber";
-import getProvider from "@/lib/web3/getProvider";
+import { publicClient, walletClient } from "@/lib/web3/getProvider";
 
 import Flex from "@/components/Flex";
 import NFTCard from "@/components/NFTCard";
@@ -26,23 +27,20 @@ const NFTToken = ({ tokenId, tokenType, price, owner }: OnSaleNFT) => {
 
   const handleBuy = async () => {
     try {
-      const provider = getProvider();
-
-      if (!provider || !isConnected || isOwner || !isConnected) {
+      if (!isConnected || isOwner || !address) {
         return;
       }
 
       setIsBuying(true);
 
-      const signer = await provider.getSigner();
-      const saleContract = new Contract(
-        saleTokenContract.address,
-        saleTokenContract.abi,
-        signer
-      );
+      const saleContract = getContract({
+        address: saleTokenContract.address,
+        abi: saleTokenContract.abi,
+        walletClient: walletClient(address),
+      });
 
-      await saleContract.purchaseToken(tokenId, {
-        value: parseEther(price.toString()),
+      await saleContract.write.purchaseToken([tokenId], {
+        value: parseEther(`${price}`),
       });
     } catch (err) {
       console.log(err);
@@ -75,6 +73,7 @@ const NFTToken = ({ tokenId, tokenType, price, owner }: OnSaleNFT) => {
 
 const OnSale = () => {
   const [onSaleList, setOnSaleList] = useState<OnSaleNFT[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { data } = useContractRead({
     ...saleTokenContract,
@@ -91,37 +90,36 @@ const OnSale = () => {
     },
     onSuccess: async (data) => {
       try {
-        const provider = getProvider();
+        if (data === 0) return;
 
-        if (!provider || data === 0) return;
-
-        const signer = await provider.getSigner();
-        const mintContract = new Contract(
-          mintTokenContract.address,
-          mintTokenContract.abi,
-          signer
-        );
-        const saleContract = new Contract(
-          saleTokenContract.address,
-          saleTokenContract.abi,
-          signer
-        );
+        const mintContract = getContract({
+          address: mintTokenContract.address,
+          abi: mintTokenContract.abi,
+          publicClient,
+        });
+        const saleContract = getContract({
+          address: saleTokenContract.address,
+          abi: saleTokenContract.abi,
+          publicClient,
+        });
 
         const tokenList: OnSaleNFT[] = [];
 
         for (let i = 0; i < data; i++) {
           const tokenId = convertBigIntToNumber(
-            await saleContract.onSaleTokenArray(i)
+            (await saleContract.read.onSaleTokenArray([i])) as bigint
           );
           const tokenType = convertBigIntToNumber(
-            await mintContract.tokenTypes(tokenId)
+            (await mintContract.read.tokenTypes([tokenId])) as bigint
           );
           const price = parseFloat(
             formatEther(
-              convertBigIntToNumber(await saleContract.getTokenPrice(tokenId))
+              convertBigIntToNumber(
+                (await saleContract.read.getTokenPrice([tokenId])) as bigint
+              )
             )
           );
-          const owner: string = await mintContract.ownerOf(tokenId);
+          const owner = (await mintContract.read.ownerOf([tokenId])) as string;
 
           tokenList.push({
             owner,
@@ -130,19 +128,24 @@ const OnSale = () => {
             price,
           });
         }
+
         setOnSaleList(tokenList);
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     },
   });
 
   return (
     <Flex flexDirection="column" width="100%" padding="12px">
-      <SectionWithLabel label={`On Sale (${data})`}>
-        {onSaleList.map((token) => (
-          <NFTToken {...token} key={token.tokenId} />
-        ))}
+      <SectionWithLabel label={`On Sale (${data ?? 0})`}>
+        {isLoading ? (
+          <div className="nft-loading">Loading...</div>
+        ) : (
+          onSaleList.map((token) => <NFTToken {...token} key={token.tokenId} />)
+        )}
       </SectionWithLabel>
     </Flex>
   );
